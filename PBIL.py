@@ -8,22 +8,38 @@ import cfg_util
 import sascorer
 import optimize_J as opt
 
-
+# chemGE version
 def generate_bit_vector(P):  # Generate a new bit vector from the probability vector
-
+    
     bit_vector = []
     for j in range(0, len(P)):
         if random.random() < P[j]:
             bit_vector.append(1)
-    
+
         else:
             bit_vector.append(0)
     
     return bitarray(bit_vector)
 
+'''
+# Ascii version
+def generate_bit_vector(P):  # Generate a new bit vector from the probability vector
 
+    bit_vector = ''
+    for j in range(0, len(P)):
+        if j%8 == 0:  # Because bytes starting with a 1 don't work
+            bit_vector += '0'
+        
+        elif random.random() < P[j]:
+            bit_vector += '1'
 
+        else:
+            bit_vector += '0'
+    
+    return bit_vector
+'''
 
+'''
 def evaluate_test(bit_vector):
     x = int(bit_vector[0:5].to01(), 2) #Convert the 5 first digit of the bitarray in int
     y = int(bit_vector[5:10].to01(), 2) #Convert the 5 last digit of the bitarray in int
@@ -32,13 +48,15 @@ def evaluate_test(bit_vector):
     log_y.append(y)
     #return x**2 + y**2  
     return x**4 - x**3 - 20*x**2 + x + 1 + y**4 - y**3 - 20*y**2 + y + 1
+'''
 
+# chemGE version
 def BITtoGene(bit_vector):  # Takes a bitarray object
     # The bit_vector is composed of multiple bytes aligned one after the other
     # 8 bits = 1 byte 
     # 1 byte is translated into 1 integer
 
-    #  /!\ ONLY WORKS WITH INTEGER /!\
+    #  /! ONLY WORKS WITH INTEGER /!\
 
     byte_list = [bit_vector[x:x+8] for x in range(0,len(bit_vector),8)]  # Splits the bitvector in a list of byte
 
@@ -52,7 +70,8 @@ def BITtoGene(bit_vector):  # Takes a bitarray object
 
     return gene
 
-
+'''
+# Ascii version
 ## Taken from stackoverflow forum ##
 def text_to_bits(text, encoding='utf-8', errors='surrogatepass'):
     bits = bin(int(binascii.hexlify(text.encode(encoding, errors)), 16))[2:]
@@ -68,14 +87,15 @@ def int2bytes(i):
     return binascii.unhexlify(hex_string.zfill(n + (n & 1)))
 ##                               ##
 
-def BITtoGene2(bit_vector):
+def BITtoSMILE(bit_vector):
 
-    gene = bits_to_text(bit_vector)
+    SMILE = bits_to_text(bit_vector)
 
-    return gene
+    return SMILE
+'''
 
 
-
+# chemGE version
 def evaluate(bit_vector):  # Takes a bitarray object
     # gene is a list of int, bit_vector a bitarray
     gene = BITtoGene(bit_vector) 
@@ -83,16 +103,25 @@ def evaluate(bit_vector):  # Takes a bitarray object
     score = score_util.calc_score(smile)  # Calculate the J score
     return score
 
+
+# Ascii version
+'''
+def evaluate(bit_vector): #Take a string composed of bytes aligned one after the other and translate it into a SMILE
+    smile = BITtoSMILE(bit_vector) 
+    score = score_util.calc_score(smile)  # Calculate the J score
+    return score
+'''
+
 def main():
 
-    global log_x     # Optional, to keep a trace of the evolution
-    global log_y
+    #global log_x     # Optional, to keep a trace of the evolution
+    #global log_y
 
-    log_x = []
-    log_y = []
+    #log_x = []
+    #log_y = []
 
-    max_generation = 100000
-    population_size = 100
+    max_generation = 10000
+    population_size = 1000
     bit_vector_size = 160  # Maximum length of vectors in the population (should be a multiple of 8)
 
     P = [0.5 for _ in range(0,bit_vector_size)]  # Probability vector
@@ -103,6 +132,7 @@ def main():
     k = 0
     converge = False  # TO DO
     best_fitness = -10**11
+    best_bit_vector = None
     while converge == False and k < max_generation:
         
         population = []
@@ -120,7 +150,7 @@ def main():
 
         for j in range(0, len(P)):
 
-            P[j] = P[j]*(1 - LR) + best_bit_vector[j]*LR  # Update the probability vector with the best indiv
+            P[j] = P[j]*(1 - LR) + int(best_bit_vector[j])*LR  # Update the probability vector with the best indiv
 
         for j in range(0,len(P)):
 
