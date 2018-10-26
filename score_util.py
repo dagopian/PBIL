@@ -11,7 +11,7 @@ rdBase.DisableLog('rdApp.error')
 
 
 # from https://github.com/gablg1/ORGAN/blob/master/organ/mol_metrics.py#L83
-def verify_sequence(smile):
+def verify_sequence(smile): 
     mol = Chem.MolFromSmiles(smile)
     return smile != '' and mol is not None and mol.GetNumAtoms() > 1
 
@@ -53,6 +53,7 @@ def calc_score(smiles):
             score = (current_SA_score_normalized
                      + current_log_P_value_normalized
                      + current_cycle_score_normalized)
+            score = current_SA_score + current_log_P_value + current_cycle_score
             return score
         except Exception:
             return -1e10

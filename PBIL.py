@@ -112,6 +112,15 @@ def evaluate(bit_vector): #Take a string composed of bytes aligned one after the
     return score
 '''
 
+
+def convergence(P):
+    # Take the vector of probability and check if all the elements are
+    # Inferior to 0.01 or superior to 0.99
+    boolean = all((i >0.01 and not i<0.99) or (not i>0.01 and i <0.99) for i in P)
+    # If TRUE then it stop the while loop
+    return boolean 
+
+
 def main():
 
     #global log_x     # Optional, to keep a trace of the evolution
@@ -120,12 +129,12 @@ def main():
     #log_x = []
     #log_y = []
 
-    max_generation = 10000
-    population_size = 1000
-    bit_vector_size = 160  # Maximum length of vectors in the population (should be a multiple of 8)
+    max_generation = 5
+    population_size = 100
+    bit_vector_size = 3400  # Maximum length of vectors in the population (should be a multiple of 8)
 
     P = [0.5 for _ in range(0,bit_vector_size)]  # Probability vector
-    LR = 0.2  # Learning Rate (typically 0.1–0.4)
+    LR = 0.1  # Learning Rate (typically 0.1–0.4)
     MS = 0.05  # Degree of mutation (typical value is 0.05)
     Pr_mutation = 0.02  # Probability of mutation (typically 0.02)
 
@@ -133,7 +142,7 @@ def main():
     converge = False  # TO DO
     best_fitness = -10**11
     best_bit_vector = None
-    while converge == False and k < max_generation:
+    while converge is not True and k < max_generation:
         
         population = []
         
@@ -142,26 +151,38 @@ def main():
             bit_vector = generate_bit_vector(P)  # Create a new vector which represent an individual
             population.append(bit_vector)
             fitness = evaluate(population[i])  # Evaluate the fitness of the new vector
-            print(fitness)
+            #print(fitness)
+            #gene = BITtoGene(bit_vector) 
+            #smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))
+            #print(smile)
             if fitness > best_fitness:  # /!\ '<' and '>'
 
                 best_fitness = fitness  # Update the best individual (i.e. max fitness)
                 best_bit_vector = bit_vector
-
+                
+                gene = BITtoGene(best_bit_vector) 
+                smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))
+                print(best_fitness,'=',smile)
+        # Evolution
         for j in range(0, len(P)):
 
             P[j] = P[j]*(1 - LR) + int(best_bit_vector[j])*LR  # Update the probability vector with the best indiv
 
+        # Mutation
         for j in range(0,len(P)):
 
             if random.random() < Pr_mutation:
 
                 P[j] = P[j]*(1 - MS) + random.randint(0, 1)*MS
 
+        converge = convergence(P)        
         k += 1
         print(k)
         #print(best_bit_vector, int(best_bit_vector[0:5].to01(), 2), int(best_bit_vector[5:10].to01(), 2)) #Debugging to delete
     #   print('\n',log_x,'\n',log_y)    
+    gene = BITtoGene(best_bit_vector) 
+    smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))
+    print(smile)
     return best_bit_vector
 
 
