@@ -1,12 +1,19 @@
 import random
 from bitarray import bitarray  # /!\ Need to install bitarray /!\
 import binascii
+import pickle 
+import os
+import time as t
 
 import zinc_grammar 
 import score_util
 import cfg_util
 import sascorer
 import optimize_J as opt
+
+from rdkit.Chem import Draw
+from rdkit.Chem import MolFromSmiles
+from rdkit.Chem import AllChem as Chem
 
 # chemGE version
 def generate_bit_vector(P):  # Generate a new bit vector from the probability vector
@@ -115,40 +122,92 @@ def evaluate(bit_vector): #Take a string composed of bytes aligned one after the
 
 def convergence(P):
     # Take the vector of probability and check if all the elements are
-    # Inferior to 0.01 or superior to 0.99
-    boolean = all((i >0.01 and not i<0.99) or (not i>0.01 and i <0.99) for i in P)
+    # inferior to 0.05 or superior to 0.95
+    boolean = all((i >0.05 and not i<0.95) or (not i>0.05 and i <0.95) for i in P)
     # If TRUE then it stop the while loop
+    if boolean == True:
+        print('CONVERGENCE')
     return boolean 
+ 
+
+def save_log(population):
+    save = input("Save logs and image of final population ? (press 'y' or 'n') : ")
+    if save == 'n':
+        pass
+
+    else:
+        directory = input("Please input log file name (or directory) : ")
+        
+        # Creating a folder for this log
+
+        os.system('mkdir '+ directory)
+        file_name = directory
+
+        # Stocking the final population in a pickle object
+
+        f = open(directory + '/' + file_name + ".p",'wb')
+        
+        # Remove double and non valid smile from the list befor stocking it
+
+        ms = []
+        smile_list = []
+        for bit_vector in population:
+            gene = BITtoGene(bit_vector) 
+            smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))
+            
+            if smile != '' and smile != None and smile not in smile_list:            
+                if MolFromSmiles(smile) != None:
+                    smile_list.append(smile)
+                    ms.append(MolFromSmiles(smile))
+        pickle.dump(smile_list,f)
+        f.close()
+
+        # Stocking the random.seed of this experiement in a file 
+
+        f = open(directory + '/' + 'seed.txt','w')
+        f.write(time)
+        f.close()
+    
+    # Saving population Image
+
+    if save == 'n':
+        pass
+    
+    else:
+        for i in range(len(ms)):
+            Chem.Draw.MolToFile(ms[i], directory+'/'+ str(i) + '.png' , size=(100,100))
+        os.system('montage *.png final.png')  # Execute this command in the shell. Put all images of the molecules in a unique image
+
+
 
 
 def main():
 
-    #global log_x     # Optional, to keep a trace of the evolution
-    #global log_y
+    global time
+    time = t.time()
+    random.seed(time)
 
-    #log_x = []
-    #log_y = []
-
-    max_generation = 5
+    max_generation = 1000
     population_size = 100
-    bit_vector_size = 3400  # Maximum length of vectors in the population (should be a multiple of 8)
+    bit_vector_size = 2400  # Maximum length of vectors in the population (should be a multiple of 8)
 
     P = [0.5 for _ in range(0,bit_vector_size)]  # Probability vector
     LR = 0.1  # Learning Rate (typically 0.1–0.4)
     MS = 0.05  # Degree of mutation (typical value is 0.05)
-    Pr_mutation = 0.02  # Probability of mutation (typically 0.02)
+    Pr_mutation = 0.08  # Probability of mutation (typically 0.02)
 
     k = 0
-    converge = False  # TO DO
-    best_fitness = -10**11
+    converge = False  
+    best_fitness = -1e11
     best_bit_vector = None
     while converge is not True and k < max_generation:
         
         population = []
-        
+        best_bit_vector = None
+        best_fitness = -1e10
         for i in range(0, population_size):
 
-            bit_vector = generate_bit_vector(P)  # Create a new vector which represent an individual
+            bit_vector = generate_bit_vector(P)  # Create a new vector which represents an individual
             population.append(bit_vector)
             fitness = evaluate(population[i])  # Evaluate the fitness of the new vector
             #print(fitness)
@@ -163,26 +222,31 @@ def main():
                 gene = BITtoGene(best_bit_vector) 
                 smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))
                 print(best_fitness,'=',smile)
-        # Evolution
-        for j in range(0, len(P)):
+        try :
+            # Evolution
+            for j in range(0, len(P)):
 
-            P[j] = P[j]*(1 - LR) + int(best_bit_vector[j])*LR  # Update the probability vector with the best indiv
+                P[j] = P[j]*(1 - LR) + int(best_bit_vector[j])*LR  # Update the probability vector with the best indiv
 
-        # Mutation
-        for j in range(0,len(P)):
+            # Mutation
+            for j in range(0,len(P)):
 
-            if random.random() < Pr_mutation:
+                if random.random() < Pr_mutation:
 
-                P[j] = P[j]*(1 - MS) + random.randint(0, 1)*MS
-
+                    P[j] = P[j]*(1 - MS) + random.randint(0, 1)*MS
+        except :
+            print('No valid SMILE generated : pass')
         converge = convergence(P)        
         k += 1
         print(k)
-        #print(best_bit_vector, int(best_bit_vector[0:5].to01(), 2), int(best_bit_vector[5:10].to01(), 2)) #Debugging to delete
-    #   print('\n',log_x,'\n',log_y)    
+        
     gene = BITtoGene(best_bit_vector) 
     smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))
     print(smile)
+
+    
+    save_log(population)
+
     return best_bit_vector
 
 

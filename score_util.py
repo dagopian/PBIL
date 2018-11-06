@@ -53,7 +53,7 @@ def calc_score(smiles):
             score = (current_SA_score_normalized
                      + current_log_P_value_normalized
                      + current_cycle_score_normalized)
-            score = current_SA_score + current_log_P_value + current_cycle_score
+            #score = current_SA_score + current_log_P_value + current_cycle_score
             return score
         except Exception:
             return -1e10
