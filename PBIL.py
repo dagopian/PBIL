@@ -165,7 +165,7 @@ def save_log(population):
         # Stocking the random.seed of this experiement in a file 
 
         f = open(directory + '/' + 'seed.txt','w')
-        f.write(time)
+        f.write(str(time))
         f.close()
     
     # Saving population Image
@@ -175,8 +175,8 @@ def save_log(population):
     
     else:
         for i in range(len(ms)):
-            Chem.Draw.MolToFile(ms[i], directory+'/'+ str(i) + '.png' , size=(100,100))
-        os.system('montage *.png final.png')  # Execute this command in the shell. Put all images of the molecules in a unique image
+            Draw.MolToFile(ms[i], directory+'/'+ str(i) + '.png' , size=(100,100))
+        os.system('montage ' +directory+'/*.png ' +directory+'/final.png')  # Execute this command in the shell. Put all images of the molecules in a unique image
 
 
 
@@ -185,9 +185,10 @@ def main():
 
     global time
     time = t.time()
+    print(time)
     random.seed(time)
 
-    max_generation = 1000
+    max_generation = 500
     population_size = 100
     bit_vector_size = 2400  # Maximum length of vectors in the population (should be a multiple of 8)
 
