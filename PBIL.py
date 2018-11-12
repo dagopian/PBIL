@@ -15,6 +15,7 @@ from rdkit.Chem import Draw
 from rdkit.Chem import MolFromSmiles
 from rdkit.Chem import AllChem as Chem
 
+
 # chemGE version
 def generate_bit_vector(P):  # Generate a new bit vector from the probability vector
     
@@ -28,34 +29,6 @@ def generate_bit_vector(P):  # Generate a new bit vector from the probability ve
     
     return bitarray(bit_vector)
 
-'''
-# Ascii version
-def generate_bit_vector(P):  # Generate a new bit vector from the probability vector
-
-    bit_vector = ''
-    for j in range(0, len(P)):
-        if j%8 == 0:  # Because bytes starting with a 1 don't work
-            bit_vector += '0'
-        
-        elif random.random() < P[j]:
-            bit_vector += '1'
-
-        else:
-            bit_vector += '0'
-    
-    return bit_vector
-'''
-
-'''
-def evaluate_test(bit_vector):
-    x = int(bit_vector[0:5].to01(), 2) #Convert the 5 first digit of the bitarray in int
-    y = int(bit_vector[5:10].to01(), 2) #Convert the 5 last digit of the bitarray in int
-    #print(x,y)
-    log_x.append(x)
-    log_y.append(y)
-    #return x**2 + y**2  
-    return x**4 - x**3 - 20*x**2 + x + 1 + y**4 - y**3 - 20*y**2 + y + 1
-'''
 
 # chemGE version
 def BITtoGene(bit_vector):  # Takes a bitarray object
@@ -77,30 +50,6 @@ def BITtoGene(bit_vector):  # Takes a bitarray object
 
     return gene
 
-'''
-# Ascii version
-## Taken from stackoverflow forum ##
-def text_to_bits(text, encoding='utf-8', errors='surrogatepass'):
-    bits = bin(int(binascii.hexlify(text.encode(encoding, errors)), 16))[2:]
-    return bits.zfill(8 * ((len(bits) + 7) // 8))
-
-def bits_to_text(bits, encoding='utf-8', errors='surrogatepass'):
-    n = int(bits, 2)
-    return int2bytes(n).decode(encoding, errors)
-
-def int2bytes(i):
-    hex_string = '%x' % i
-    n = len(hex_string)
-    return binascii.unhexlify(hex_string.zfill(n + (n & 1)))
-##                               ##
-
-def BITtoSMILE(bit_vector):
-
-    SMILE = bits_to_text(bit_vector)
-
-    return SMILE
-'''
-
 
 # chemGE version
 def evaluate(bit_vector):  # Takes a bitarray object
@@ -109,15 +58,6 @@ def evaluate(bit_vector):  # Takes a bitarray object
     smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))  # Transform the gene into a smile
     score = score_util.calc_score(smile)  # Calculate the J score
     return score
-
-
-# Ascii version
-'''
-def evaluate(bit_vector): #Take a string composed of bytes aligned one after the other and translate it into a SMILE
-    smile = BITtoSMILE(bit_vector) 
-    score = score_util.calc_score(smile)  # Calculate the J score
-    return score
-'''
 
 
 def convergence(P):
@@ -182,7 +122,6 @@ def save_log(population):
         for i in range(len(ms)):
             Draw.MolToFile(ms[i], directory+'/'+ str(i) + '.png' , size=(120,120))
         os.system('montage ' +directory+'/*.png ' +directory+'/final.png')  # Execute this command in the shell. Put all images of the molecules in a unique image
-
 
 
 
