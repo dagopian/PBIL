@@ -162,10 +162,15 @@ def save_log(population):
         pickle.dump(smile_list,f)
         f.close()
 
-        # Stocking the random.seed of this experiement in a file 
+        # Stocking the random.seed of this experiement in a text file 
 
         f = open(directory + '/' + 'seed.txt','w')
-        f.write(str(time))
+        f.write(str(time)+'\n')
+        #Stocking the final population and their score in the same file
+        f.write('smile' +'\t'+ 'score'+'\n')
+        for smile in smile_list :
+            score = score_util.calc_score(smile)
+            f.write(smile + '\t' + str(score)+'\n')
         f.close()
     
     # Saving population Image
