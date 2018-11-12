@@ -180,7 +180,7 @@ def save_log(population):
     
     else:
         for i in range(len(ms)):
-            Draw.MolToFile(ms[i], directory+'/'+ str(i) + '.png' , size=(100,100))
+            Draw.MolToFile(ms[i], directory+'/'+ str(i) + '.png' , size=(120,120))
         os.system('montage ' +directory+'/*.png ' +directory+'/final.png')  # Execute this command in the shell. Put all images of the molecules in a unique image
 
 
@@ -193,7 +193,7 @@ def main():
     print(time)
     random.seed(time)
 
-    max_generation = 500
+    max_generation = 1000000
     population_size = 100
     bit_vector_size = 2400  # Maximum length of vectors in the population (should be a multiple of 8)
 
