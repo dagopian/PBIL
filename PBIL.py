@@ -36,7 +36,7 @@ def BITtoGene(bit_vector):  # Takes a bitarray object
     # 8 bits = 1 byte 
     # 1 byte is translated into 1 integer
 
-    #  /! ONLY WORKS WITH INTEGER /!\
+    #  /!\ ONLY WORKS WITH INTEGER /!\
 
     byte_list = [bit_vector[x:x+8] for x in range(0,len(bit_vector),8)]  # Splits the bitvector in a list of byte
 
@@ -122,7 +122,7 @@ def save_log(population):
         for i in range(len(ms)):
             Draw.MolToFile(ms[i], directory+'/'+ str(i) + '.png' , size=(120,120))
         os.system('montage ' +directory+'/*.png ' +directory+'/final.png')  # Execute this command in the shell. Put all images of the molecules in a unique image
-
+        # Need image magick to work...
 
 
 def main():
@@ -133,6 +133,7 @@ def main():
     random.seed(time)
 
     max_generation = 1000000
+    max_time = 8*3600  # 8 hours
     population_size = 100
     bit_vector_size = 2400  # Maximum length of vectors in the population (should be a multiple of 8)
 
@@ -142,10 +143,11 @@ def main():
     Pr_mutation = 0.08  # Probability of mutation (typically 0.02)
 
     k = 0
+    duration = 0
     converge = False  
     best_fitness = -1e11
     best_bit_vector = None
-    while converge is not True and k < max_generation:
+    while converge is not True and duration < max_time:  # k < max_generation or duration < max_time depending on what you want
         
         population = []
         best_bit_vector = None
@@ -183,7 +185,8 @@ def main():
             print('No valid SMILE generated : pass')
         converge = convergence(P)        
         k += 1
-        print(k)
+        duration = t.time()-time
+        print(k,' time : ',duration, ' s')
         
     gene = BITtoGene(best_bit_vector) 
     smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))
