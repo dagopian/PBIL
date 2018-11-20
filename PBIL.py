@@ -144,7 +144,7 @@ def main():
 
     k = 0
     duration = 0
-    converge = False  
+    converge = False
     best_fitness = -1e11
     best_bit_vector = None
     while converge is not True and duration < max_time:  # k < max_generation or duration < max_time depending on what you want
@@ -173,8 +173,9 @@ def main():
             # Evolution
             for j in range(0, len(P)):
 
-                P[j] = P[j]*(1 - LR) + int(best_bit_vector[j])*LR  # Update the probability vector with the best indiv
+                #P[j] = P[j]*(1 - LR) + int(best_bit_vector[j])*LR  # Update the probability vector with the best indiv
 
+                P[j] = P[j] + LR/(P[j]*(1-P[j]))*(int(best_bit_vector[j])-P[j])  # Information Genetic implementation
             # Mutation
             for j in range(0,len(P)):
 
