@@ -181,6 +181,7 @@ def main():
                 #P[j] = P[j]*(1 - LR) + int(best_bit_vector[j])*LR  # Update the probability vector with the best indiv
 
                 score_smile = sorted(score_smile, key = lambda x: x[0], reverse = False)  # The best smile is a the end of the list 
+                print(score_smile)
                 if len(score_smile) < mu:
                     N = len(score_smile)
                 else:
@@ -189,8 +190,8 @@ def main():
                 for i in range(N):
                     X += (i+1)*(score_smile[i][1][j]-P[j])
                 
-                P[j] = P[j] + LR/(P[j]*(1-P[j]))*X  # Information Genetic implementation
-                print('test')
+                P[j] = P[j] + LR/(P[j]*(1-P[j]))*X  # Information Geometric implementation
+                
             # Mutation
             for j in range(0,len(P)):
 
