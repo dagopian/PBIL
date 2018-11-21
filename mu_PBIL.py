@@ -142,7 +142,7 @@ def main():
     MS = 0.05  # Degree of mutation (typical value is 0.05)
     Pr_mutation = 0.08  # Probability of mutation (typically 0.02)
 
-    mu = 3  # Number of vector used to make P evolve
+    mu = 2  # Number of vector used to make P evolve
 
     k = 0
     duration = 0
@@ -190,7 +190,7 @@ def main():
                     X += (i+1)*(score_smile[i][1][j]-P[j])
                 
                 P[j] = P[j] + LR/(P[j]*(1-P[j]))*X  # Information Genetic implementation
-            
+                print('test')
             # Mutation
             for j in range(0,len(P)):
 
