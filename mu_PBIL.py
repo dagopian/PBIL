@@ -160,7 +160,7 @@ def main():
             bit_vector = generate_bit_vector(P)  # Create a new vector which represents an individual
             population.append(bit_vector)
             fitness = evaluate(population[i])  # Evaluate the fitness of the new vectorsr
-            if fitness > -1e10
+            if fitness > -1e10:
                 score_smile.append([fitness,bit_vector])
             #print(fitness)
             #gene = BITtoGene(bit_vector) 
