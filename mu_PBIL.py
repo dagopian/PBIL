@@ -160,7 +160,8 @@ def main():
             bit_vector = generate_bit_vector(P)  # Create a new vector which represents an individual
             population.append(bit_vector)
             fitness = evaluate(population[i])  # Evaluate the fitness of the new vectorsr
-            score_smile.append([fitness,bit_vector])
+            if fitness > -1e10
+                score_smile.append([fitness,bit_vector])
             #print(fitness)
             #gene = BITtoGene(bit_vector) 
             #smile = opt.canonicalize(cfg_util.decode(opt.GenetoCFG(gene)))
@@ -180,8 +181,12 @@ def main():
                 #P[j] = P[j]*(1 - LR) + int(best_bit_vector[j])*LR  # Update the probability vector with the best indiv
 
                 score_smile = sorted(score_smile, key = lambda x: x[0], reverse = False)  # The best smile is a the end of the list 
+                if len(score_smile) < mu:
+                    N = len(score_smile)
+                else:
+                    N = mu
                 X = 0
-                for i in range(mu):
+                for i in range(N):
                     X += (i+1)*(score_smile[i][1][j]-P[j])
                 
                 P[j] = P[j] + LR/(P[j]*(1-P[j]))*X  # Information Genetic implementation
